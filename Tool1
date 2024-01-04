@@ -1,0 +1,439 @@
+import os
+import cv2
+import shutil
+from colorama import init, Fore, Style
+
+# Khởi tạo colorama
+init(autoreset=True)
+
+print(Fore.YELLOW + "Y Ƀao")
+print(Fore.YELLOW + "siuybao@gmail.com")
+print("\n")
+print(Fore.YELLOW + "-" * 7)
+
+while True:
+    folder_path = input(Fore.YELLOW + "Nhập đường dẫn tới thư mục chứa video: ")
+    if os.path.exists(folder_path):
+        break
+    else:
+        print(Fore.RED + "Không tìm thấy thư mục, hãy nhập lại !")
+        print(Fore.YELLOW + "*" * 7)
+
+folders = {}
+
+def read_video_info(video_path):
+    # Mở video
+    video = cv2.VideoCapture(video_path)
+
+    # Kiểm tra xem video có mở thành công không
+    if not video.isOpened():
+        print(f"Không thể mở video: {video_path}")
+        return
+
+    # Đọc thông tin về video
+    width = int(video.get(cv2.CAP_PROP_FRAME_WIDTH))
+    height = int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    frame_rate = video.get(cv2.CAP_PROP_FPS)
+    num_frames = int(video.get(cv2.CAP_PROP_FRAME_COUNT))
+    codec = int(video.get(cv2.CAP_PROP_FOURCC))  # Chuyển đổi codec sang kiểu số nguyên
+
+    # Chuyển mã codec sang định dạng
+    codec_info = "".join([chr(codec & 0xFF), chr((codec >> 8) & 0xFF), chr((codec >> 16) & 0xFF), chr((codec >> 24) & 0xFF)])
+    if codec_info == "hevc":
+        codec_info = "h265"
+
+    # Đóng video
+    video.release()
+    # Xuất thông tin
+    print("Path:", video_path)
+    print("Kích thước: {}x{}".format(width, height))
+    print("Tốc độ khung hình: {:.2f}".format(frame_rate))
+    print("Số lượng khung hình: {}".format(num_frames))
+    print("Định dạng video: {}".format(codec_info))
+    size_string = f"{width}x{height}"
+    return {
+        "Path": video_path,
+        "Kích thước": size_string,
+        "Tốc độ khung hình": f"{frame_rate:.2f}",
+        "Số lượng khung hình": num_frames,
+        "Định dạng video": codec_info
+    }
+
+def classify_video(video_info):
+    width, height = map(int, video_info["Kích thước"].split('x'))
+    frame_rate = float(video_info["Tốc độ khung hình"])
+    codec_info = video_info["Định dạng video"]
+    if (height == 720 and width == 1280) or (height == 1280 and width == 720):
+        if 28 <= frame_rate <= 34:
+            if 'h264' in codec_info.lower():
+                ThuMucMoi = "HD_30fps_H264"
+                PathThuMucMoi = os.path.join(folder_path,str(ThuMucMoi))
+                # Kiểm tra xem thư mục đã tồn tại hay chưa
+                if not os.path.exists(PathThuMucMoi):
+                    os.makedirs(PathThuMucMoi)
+                folder_dir = os.path.join(folder_path, ThuMucMoi)
+                if ThuMucMoi not in folders:
+                    folders[ThuMucMoi] = []
+                folders[ThuMucMoi].append(video_info["Path"])
+                if video_info["Path"] in folders[ThuMucMoi]:
+                    # Di chuyển tệp
+                    shutil.move(video_info["Path"], folder_dir)
+                    print(Fore.GREEN + "\n-> Di chuyển thành công!")
+                    print("Đường dẫn tới tệp vừa di chuyển:", os.path.join(folder_dir, os.path.basename(video_info["Path"])))
+            elif 'h265' in codec_info.lower():
+                ThuMucMoi = "HD_30fps_H265"
+                PathThuMucMoi = os.path.join(folder_path,str(ThuMucMoi))
+                # Kiểm tra xem thư mục đã tồn tại hay chưa
+                if not os.path.exists(PathThuMucMoi):
+                    os.makedirs(PathThuMucMoi)
+                folder_dir = os.path.join(folder_path, ThuMucMoi)
+                if ThuMucMoi not in folders:
+                    folders[ThuMucMoi] = []
+                folders[ThuMucMoi].append(video_info["Path"])
+                if video_info["Path"] in folders[ThuMucMoi]:
+                    # Di chuyển tệp
+                    shutil.move(video_info["Path"], folder_dir)
+                    print(Fore.GREEN + "\n-> Di chuyển thành công!")
+                    print("Đường dẫn tới tệp vừa di chuyển:", os.path.join(folder_dir, os.path.basename(video_info["Path"])))
+            else: print(Fore.RED + "\n-> Codec không phù hợp!")
+
+        elif 55 <= frame_rate <= 62:
+            if 'h264' in codec_info.lower():
+                ThuMucMoi = "HD_60fps_H264"
+                PathThuMucMoi = os.path.join(folder_path,str(ThuMucMoi))
+                # Kiểm tra xem thư mục đã tồn tại hay chưa
+                if not os.path.exists(PathThuMucMoi):
+                    os.makedirs(PathThuMucMoi)
+                folder_dir = os.path.join(folder_path, ThuMucMoi)
+                if ThuMucMoi not in folders:
+                    folders[ThuMucMoi] = []
+                folders[ThuMucMoi].append(video_info["Path"])
+                if video_info["Path"] in folders[ThuMucMoi]:
+                    # Di chuyển tệp
+                    shutil.move(video_info["Path"], folder_dir)
+                    print(Fore.GREEN + "\n-> Di chuyển thành công!")
+                    print("Đường dẫn tới tệp vừa di chuyển:", os.path.join(folder_dir, os.path.basename(video_info["Path"])))
+            elif 'h265' in codec_info.lower():
+                ThuMucMoi = "HD_60fps_H265"
+                PathThuMucMoi = os.path.join(folder_path,str(ThuMucMoi))
+                # Kiểm tra xem thư mục đã tồn tại hay chưa
+                if not os.path.exists(PathThuMucMoi):
+                    os.makedirs(PathThuMucMoi)
+                folder_dir = os.path.join(folder_path, ThuMucMoi)
+                if ThuMucMoi not in folders:
+                    folders[ThuMucMoi] = []
+                folders[ThuMucMoi].append(video_info["Path"])
+                if video_info["Path"] in folders[ThuMucMoi]:
+                    # Di chuyển tệp
+                    shutil.move(video_info["Path"], folder_dir)
+                    print(Fore.GREEN + "\n-> Di chuyển thành công!")
+                    print("Đường dẫn tới tệp vừa di chuyển:", os.path.join(folder_dir, os.path.basename(video_info["Path"])))
+            else: print(Fore.RED + "\n-> Codec không phù hợp!")
+
+        elif frame_rate <= 120:
+            if 'h264' in codec_info.lower():
+                ThuMucMoi = "HD_30fps_H264"
+                PathThuMucMoi = os.path.join(folder_path,str(ThuMucMoi))
+                # Kiểm tra xem thư mục đã tồn tại hay chưa
+                if not os.path.exists(PathThuMucMoi):
+                    os.makedirs(PathThuMucMoi)
+                folder_dir = os.path.join(folder_path, ThuMucMoi)
+                if ThuMucMoi not in folders:
+                    folders[ThuMucMoi] = []
+                folders[ThuMucMoi].append(video_info["Path"])
+                if video_info["Path"] in folders[ThuMucMoi]:
+                    # Di chuyển tệp
+                    shutil.move(video_info["Path"], folder_dir)
+                    print(Fore.GREEN + "\n-> Di chuyển thành công!")
+                    print("Đường dẫn tới tệp vừa di chuyển:", os.path.join(folder_dir, os.path.basename(video_info["Path"])))
+            elif 'h265' in codec_info.lower():
+                ThuMucMoi = "HD_30fps_H265"
+                PathThuMucMoi = os.path.join(folder_path,str(ThuMucMoi))
+                # Kiểm tra xem thư mục đã tồn tại hay chưa
+                if not os.path.exists(PathThuMucMoi):
+                    os.makedirs(PathThuMucMoi)
+                folder_dir = os.path.join(folder_path, ThuMucMoi)
+                if ThuMucMoi not in folders:
+                    folders[ThuMucMoi] = []
+                folders[ThuMucMoi].append(video_info["Path"])
+                if video_info["Path"] in folders[ThuMucMoi]:
+                    # Di chuyển tệp
+                    shutil.move(video_info["Path"], folder_dir)
+                    print(Fore.GREEN + "\n-> Di chuyển thành công!")
+                    print("Đường dẫn tới tệp vừa di chuyển:", os.path.join(folder_dir, os.path.basename(video_info["Path"])))
+            else: print(Fore.RED + "\n-> Codec không phù hợp!")
+
+    elif (height == 1080 and width == 1920) or (height == 1920 and width == 1080):
+        if 28 <= frame_rate <= 34:
+            if 'h264' in codec_info.lower():
+                ThuMucMoi = "FullHD_30fps_H264"
+                PathThuMucMoi = os.path.join(folder_path,str(ThuMucMoi))
+                # Kiểm tra xem thư mục đã tồn tại hay chưa
+                if not os.path.exists(PathThuMucMoi):
+                    os.makedirs(PathThuMucMoi)
+                folder_dir = os.path.join(folder_path, ThuMucMoi)
+                if ThuMucMoi not in folders:
+                    folders[ThuMucMoi] = []
+                folders[ThuMucMoi].append(video_info["Path"])
+                if video_info["Path"] in folders[ThuMucMoi]:
+                    # Di chuyển tệp
+                    shutil.move(video_info["Path"], folder_dir)
+                    print(Fore.GREEN + "\n-> Di chuyển thành công!")
+                    print("Đường dẫn tới tệp vừa di chuyển:", os.path.join(folder_dir, os.path.basename(video_info["Path"])))
+            elif 'h265' in codec_info.lower():
+                ThuMucMoi = "FullHD_30fps_H265"
+                PathThuMucMoi = os.path.join(folder_path,str(ThuMucMoi))
+                # Kiểm tra xem thư mục đã tồn tại hay chưa
+                if not os.path.exists(PathThuMucMoi):
+                    os.makedirs(PathThuMucMoi)
+                folder_dir = os.path.join(folder_path, ThuMucMoi)
+                if ThuMucMoi not in folders:
+                    folders[ThuMucMoi] = []
+                folders[ThuMucMoi].append(video_info["Path"])
+                if video_info["Path"] in folders[ThuMucMoi]:
+                    # Di chuyển tệp
+                    shutil.move(video_info["Path"], folder_dir)
+                    print(Fore.GREEN + "\n-> Di chuyển thành công!")
+                    print("Đường dẫn tới tệp vừa di chuyển:", os.path.join(folder_dir, os.path.basename(video_info["Path"])))
+            else: print(Fore.RED + "\n-> Codec không phù hợp!")
+
+        elif 55 <= frame_rate <= 62:
+            if 'h264' in codec_info.lower():
+                ThuMucMoi = "FullHD_60fps_H264"
+                PathThuMucMoi = os.path.join(folder_path,str(ThuMucMoi))
+                # Kiểm tra xem thư mục đã tồn tại hay chưa
+                if not os.path.exists(PathThuMucMoi):
+                    os.makedirs(PathThuMucMoi)
+                folder_dir = os.path.join(folder_path, ThuMucMoi)
+                if ThuMucMoi not in folders:
+                    folders[ThuMucMoi] = []
+                folders[ThuMucMoi].append(video_info["Path"])
+                if video_info["Path"] in folders[ThuMucMoi]:
+                    # Di chuyển tệp
+                    shutil.move(video_info["Path"], folder_dir)
+                    print(Fore.GREEN + "\n-> Di chuyển thành công!")
+                    print("Đường dẫn tới tệp vừa di chuyển:", os.path.join(folder_dir, os.path.basename(video_info["Path"])))
+            elif 'h265' in codec_info.lower():
+                ThuMucMoi = "FullHD_60fps_H265"
+                PathThuMucMoi = os.path.join(folder_path,str(ThuMucMoi))
+                # Kiểm tra xem thư mục đã tồn tại hay chưa
+                if not os.path.exists(PathThuMucMoi):
+                    os.makedirs(PathThuMucMoi)
+                folder_dir = os.path.join(folder_path, ThuMucMoi)
+                if ThuMucMoi not in folders:
+                    folders[ThuMucMoi] = []
+                folders[ThuMucMoi].append(video_info["Path"])
+                if video_info["Path"] in folders[ThuMucMoi]:
+                    # Di chuyển tệp
+                    shutil.move(video_info["Path"], folder_dir)
+                    print(Fore.GREEN + "\n-> Di chuyển thành công!")
+                    print("Đường dẫn tới tệp vừa di chuyển:", os.path.join(folder_dir, os.path.basename(video_info["Path"])))
+            else: print(Fore.RED + "\n-> Codec không phù hợp!")
+
+        elif frame_rate <= 120:
+            if 'h264' in codec_info.lower():
+                ThuMucMoi = "FullHD_30fps_H264"
+                PathThuMucMoi = os.path.join(folder_path,str(ThuMucMoi))
+                # Kiểm tra xem thư mục đã tồn tại hay chưa
+                if not os.path.exists(PathThuMucMoi):
+                    os.makedirs(PathThuMucMoi)
+                folder_dir = os.path.join(folder_path, ThuMucMoi)
+                if ThuMucMoi not in folders:
+                    folders[ThuMucMoi] = []
+                folders[ThuMucMoi].append(video_info["Path"])
+                if video_info["Path"] in folders[ThuMucMoi]:
+                    # Di chuyển tệp
+                    shutil.move(video_info["Path"], folder_dir)
+                    print(Fore.GREEN + "\n-> Di chuyển thành công!")
+                    print("Đường dẫn tới tệp vừa di chuyển:", os.path.join(folder_dir, os.path.basename(video_info["Path"])))
+            elif 'h265' in codec_info.lower():
+                ThuMucMoi = "FullHD_30fps_H265"
+                PathThuMucMoi = os.path.join(folder_path,str(ThuMucMoi))
+                # Kiểm tra xem thư mục đã tồn tại hay chưa
+                if not os.path.exists(PathThuMucMoi):
+                    os.makedirs(PathThuMucMoi)
+                folder_dir = os.path.join(folder_path, ThuMucMoi)
+                if ThuMucMoi not in folders:
+                    folders[ThuMucMoi] = []
+                folders[ThuMucMoi].append(video_info["Path"])
+                if video_info["Path"] in folders[ThuMucMoi]:
+                    # Di chuyển tệp
+                    shutil.move(video_info["Path"], folder_dir)
+                    print(Fore.GREEN + "\n-> Di chuyển thành công!")
+                    print("Đường dẫn tới tệp vừa di chuyển:", os.path.join(folder_dir, os.path.basename(video_info["Path"])))
+            else: print(Fore.RED + "\n-> Codec không phù hợp!")
+
+    elif (height == 2160 and width == 3840) or (height == 3840 and width == 2160):
+        if 28 <= frame_rate <= 34:
+            if 'h264' in codec_info.lower():
+                ThuMucMoi = "4K_30fps_H264"
+                PathThuMucMoi = os.path.join(folder_path,str(ThuMucMoi))
+                # Kiểm tra xem thư mục đã tồn tại hay chưa
+                if not os.path.exists(PathThuMucMoi):
+                    os.makedirs(PathThuMucMoi)
+                folder_dir = os.path.join(folder_path, ThuMucMoi)
+                if ThuMucMoi not in folders:
+                    folders[ThuMucMoi] = []
+                folders[ThuMucMoi].append(video_info["Path"])
+                if video_info["Path"] in folders[ThuMucMoi]:
+                    # Di chuyển tệp
+                    shutil.move(video_info["Path"], folder_dir)
+                    print(Fore.GREEN + "\n-> Di chuyển thành công!")
+                    print("Đường dẫn tới tệp vừa di chuyển:", os.path.join(folder_dir, os.path.basename(video_info["Path"])))
+            elif 'h265' in codec_info.lower():
+                ThuMucMoi = "4K_30fps_H265"
+                PathThuMucMoi = os.path.join(folder_path,str(ThuMucMoi))
+                # Kiểm tra xem thư mục đã tồn tại hay chưa
+                if not os.path.exists(PathThuMucMoi):
+                    os.makedirs(PathThuMucMoi)
+                folder_dir = os.path.join(folder_path, ThuMucMoi)
+                if ThuMucMoi not in folders:
+                    folders[ThuMucMoi] = []
+                folders[ThuMucMoi].append(video_info["Path"])
+                if video_info["Path"] in folders[ThuMucMoi]:
+                    # Di chuyển tệp
+                    shutil.move(video_info["Path"], folder_dir)
+                    print(Fore.GREEN + "\n-> Di chuyển thành công!")
+                    print("Đường dẫn tới tệp vừa di chuyển:", os.path.join(folder_dir, os.path.basename(video_info["Path"])))
+            else: print(Fore.RED + "\n-> Codec không phù hợp!")
+
+        elif 55 <= frame_rate <= 62:
+            if 'h264' in codec_info.lower():
+                ThuMucMoi = "4K_60fps_H264"
+                PathThuMucMoi = os.path.join(folder_path,str(ThuMucMoi))
+                # Kiểm tra xem thư mục đã tồn tại hay chưa
+                if not os.path.exists(PathThuMucMoi):
+                    os.makedirs(PathThuMucMoi)
+                folder_dir = os.path.join(folder_path, ThuMucMoi)
+                if ThuMucMoi not in folders:
+                    folders[ThuMucMoi] = []
+                folders[ThuMucMoi].append(video_info["Path"])
+                if video_info["Path"] in folders[ThuMucMoi]:
+                    # Di chuyển tệp
+                    shutil.move(video_info["Path"], folder_dir)
+                    print(Fore.GREEN + "\n-> Di chuyển thành công!")
+                    print("Đường dẫn tới tệp vừa di chuyển:", os.path.join(folder_dir, os.path.basename(video_info["Path"])))
+            elif 'h265' in codec_info.lower():
+                ThuMucMoi = "4K_60fps_H265"
+                PathThuMucMoi = os.path.join(folder_path,str(ThuMucMoi))
+                # Kiểm tra xem thư mục đã tồn tại hay chưa
+                if not os.path.exists(PathThuMucMoi):
+                    os.makedirs(PathThuMucMoi)
+                folder_dir = os.path.join(folder_path, ThuMucMoi)
+                if ThuMucMoi not in folders:
+                    folders[ThuMucMoi] = []
+                folders[ThuMucMoi].append(video_info["Path"])
+                if video_info["Path"] in folders[ThuMucMoi]:
+                    # Di chuyển tệp
+                    shutil.move(video_info["Path"], folder_dir)
+                    print(Fore.GREEN + "\n-> Di chuyển thành công!")
+                    print("Đường dẫn tới tệp vừa di chuyển:", os.path.join(folder_dir, os.path.basename(video_info["Path"])))
+            else: print(Fore.RED + "\n-> Codec không phù hợp!")
+
+        elif frame_rate <= 120:
+            if 'h264' in codec_info.lower():
+                ThuMucMoi = "4K_30fps_H264"
+                PathThuMucMoi = os.path.join(folder_path,str(ThuMucMoi))
+                # Kiểm tra xem thư mục đã tồn tại hay chưa
+                if not os.path.exists(PathThuMucMoi):
+                    os.makedirs(PathThuMucMoi)
+                folder_dir = os.path.join(folder_path, ThuMucMoi)
+                if ThuMucMoi not in folders:
+                    folders[ThuMucMoi] = []
+                folders[ThuMucMoi].append(video_info["Path"])
+                if video_info["Path"] in folders[ThuMucMoi]:
+                    # Di chuyển tệp
+                    shutil.move(video_info["Path"], folder_dir)
+                    print(Fore.GREEN + "\n-> Di chuyển thành công!")
+                    print("Đường dẫn tới tệp vừa di chuyển:", os.path.join(folder_dir, os.path.basename(video_info["Path"])))
+            elif 'h265' in codec_info.lower():
+                ThuMucMoi = "4K_30fps_H265"
+                PathThuMucMoi = os.path.join(folder_path,str(ThuMucMoi))
+                # Kiểm tra xem thư mục đã tồn tại hay chưa
+                if not os.path.exists(PathThuMucMoi):
+                    os.makedirs(PathThuMucMoi)
+                folder_dir = os.path.join(folder_path, ThuMucMoi)
+                if ThuMucMoi not in folders:
+                    folders[ThuMucMoi] = []
+                folders[ThuMucMoi].append(video_info["Path"])
+                if video_info["Path"] in folders[ThuMucMoi]:
+                    # Di chuyển tệp
+                    shutil.move(video_info["Path"], folder_dir)
+                    print(Fore.GREEN + "\n-> Di chuyển thành công!")
+                    print("Đường dẫn tới tệp vừa di chuyển:", os.path.join(folder_dir, os.path.basename(video_info["Path"])))
+            else: print(Fore.RED + "\n-> Codec không phù hợp!")
+    elif height != [720,1280,1080,1920,2160,3840]: print(Fore.RED + "\n-> Độ phân giải không phù hợp!")
+    print("-" * 50)
+
+def classify_video_2(video_info):
+    width, height = map(int, video_info["Kích thước"].split('x'))
+    frame_rate = float(video_info["Tốc độ khung hình"])
+    codec_info = video_info["Định dạng video"]
+    if 28 < frame_rate < 32: frame_rate = 30
+    if 58 < frame_rate < 62: frame_rate = 60
+    ThuMucMoi = f"{height}x{width}@{frame_rate}_{codec_info}"
+    PathThuMucMoi = os.path.join(folder_path,str(ThuMucMoi))
+    if not os.path.exists(PathThuMucMoi):
+        os.makedirs(PathThuMucMoi)
+    folder_dir = os.path.join(folder_path, ThuMucMoi)
+    if ThuMucMoi not in folders:
+        folders[ThuMucMoi] = []
+    folders[ThuMucMoi].append(video_info["Path"])
+    if video_info["Path"] in folders[ThuMucMoi]:
+        shutil.move(video_info["Path"], folder_dir)
+        print(Fore.GREEN + "\n-> Di chuyển thành công!")
+        print("Đường dẫn tới tệp vừa di chuyển:", os.path.join(folder_dir, os.path.basename(video_info["Path"])))
+    print("-" * 50)
+
+  
+video_files = [
+    os.path.join(folder_path, file)
+    for file in os.listdir(folder_path)
+    if file.lower().endswith(('.mp4', '.avi', '.mkv', '.mov'))
+]
+
+# Đếm số lượng video được tìm thấy
+num_videos_found = len(video_files)
+print(f"\nSố lượng video được tìm thấy trong thư mục: {num_videos_found}")
+
+# Chờ người dùng nhấn phím Enter để tiếp tục
+input("Nhấn Enter để tiếp tục...")
+print("\n")
+
+successful_moves = 0  # Đếm số lượng di chuyển thành công
+failed_moves = 0      # Đếm số lượng di chuyển thất bại
+
+for video_file in video_files:
+    video_info = read_video_info(video_file)
+    if video_info:
+        classify_video(video_info)
+
+# Đếm lại số lượng tệp thành công và thất bại
+total_successful_moves = sum(len(files) for files in folders.values())
+total_failed_moves = num_videos_found - total_successful_moves
+
+print(Fore.YELLOW + f"Tổng số tệp di chuyển thành công: {total_successful_moves}")
+print(Fore.YELLOW + f"Tổng số tệp di chuyển thất bại: {total_failed_moves}")
+print("-" * 10)
+if total_failed_moves != 0:
+    print(Fore.YELLOW +"Bạn có muốn chia các video còn lại theo thông tin của chúng không?")
+    while True:
+        user_input = input(Fore.YELLOW +"Y/N: ")
+        if user_input.lower() == 'y':
+            print("\n")
+            print(Fore.YELLOW +"*" * 20)
+            for video_file in video_files:
+                video_info = read_video_info(video_file)
+                if video_info:
+                    classify_video_2(video_info)
+            print("\nQuá trình sắp xếp và di chuyển tệp video đã hoàn thành.")
+            break
+        elif user_input.lower() == 'n':
+            print("\nQuá trình sắp xếp và di chuyển tệp video đã hoàn thành.")
+            break
+        else:
+            print("Lựa chọn không hợp lệ. Vui lòng nhập 'Y' hoặc 'N'.")
+
+print("=" * 50)
+print("\n")
+input(Fore.YELLOW + "Bấm enter để kết thúc!")
